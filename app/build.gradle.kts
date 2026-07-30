@@ -32,6 +32,8 @@ android {
 
     buildFeatures {
         compose = true
+        // DESATIVE OS RECURSOS XML TRADICIONAIS AQUI:
+        androidResources = false
     }
 
     publishing {
