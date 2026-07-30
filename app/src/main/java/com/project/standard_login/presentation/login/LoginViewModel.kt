@@ -1,10 +1,10 @@
-package com.project.standard_login.ui
+package com.project.standard_login.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.project.standard_login.data.LoginRepository
-import com.project.standard_login.data.LoginResult
-import com.project.standard_login.security.SecureStorage
+import com.project.standard_login.domain.repository.LoginRepository
+import com.project.standard_login.domain.model.LoginResult
+import com.project.standard_login.data.local.SecureStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,12 +18,10 @@ class LoginViewModel(
     private val _loginState = MutableStateFlow<LoginResult>(LoginResult.Idle)
     val loginState: StateFlow<LoginResult> = _loginState.asStateFlow()
 
-    // Estado para o e-mail salvo com segurança
     private val _savedEmail = MutableStateFlow<String?>(null)
     val savedEmail: StateFlow<String?> = _savedEmail.asStateFlow()
 
     init {
-        // Carrega o e-mail salvo ao iniciar
         _savedEmail.value = secureStorage.getEmail()
     }
 
@@ -32,7 +30,6 @@ class LoginViewModel(
             repository.login(email, password).collect { result ->
                 _loginState.value = result
                 if (result is LoginResult.Success) {
-                    // Salva o e-mail com segurança após sucesso
                     secureStorage.saveEmail(email)
                     _savedEmail.value = email
                 }
@@ -57,12 +54,21 @@ class LoginViewModel(
             repository.loginWithGoogle(idToken).collect { result ->
                 _loginState.value = result
                 if (result is LoginResult.Success) {
-                    _savedEmail.value = (result as LoginResult.Success).user
+                    // No caso do Google, o email vem do resultado
+                    val userEmail = (result as LoginResult.Success).user
+                    secureStorage.saveEmail(userEmail)
+                    _savedEmail.value = userEmail
                 }
             }
         }
     }
     
+    fun logout() {
+        secureStorage.clear()
+        _savedEmail.value = null
+        _loginState.value = LoginResult.Idle
+    }
+
     fun clearState() {
         _loginState.value = LoginResult.Idle
     }

@@ -2,9 +2,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    alias(libs.plugins.android.application)
+    id("com.android.library") // Transformado em Biblioteca/SDK
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("maven-publish") // Necessário para o JitPack
 }
 
 android {
@@ -12,12 +13,11 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.project.standard_login"
+        // ApplicationId removido: Bibliotecas não podem ter ID de aplicativo
         minSdk = 24
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        consumerProguardFiles("proguard-rules.pro")
     }
 
     buildTypes {
@@ -34,6 +34,29 @@ android {
 
     buildFeatures {
         compose = true
+    }
+
+    // Configura o componente de publicação para gerar o AAR
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
+}
+
+// Configuração do JitPack / Maven Publish
+afterEvaluate {
+    publishing {
+        publications {
+            register<MavenPublication>("release") {
+                from(components["release"])
+                
+                // Estes dados são usados pelo JitPack para criar o caminho da dependência
+                groupId = "com.github.kittler_ms"
+                artifactId = "standard-login-sdk"
+                version = "1.0.0"
+            }
+        }
     }
 }
 
@@ -53,16 +76,13 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-
-    // Koin
+    implementation(libs.androidx.compose.material.icons.extended)
+    
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
-
-    // Coroutines & Play Services
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
 
-    // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.play.services.auth)
@@ -76,5 +96,4 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
-// Aplicar no final do arquivo evita o erro de conflito de extensão 'kotlin'
 apply(plugin = "com.google.gms.google-services")
