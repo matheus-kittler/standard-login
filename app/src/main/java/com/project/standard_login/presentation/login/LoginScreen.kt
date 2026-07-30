@@ -1,4 +1,4 @@
-package com.project.standard_login.ui
+package com.project.standard_login.presentation.login
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.project.standard_login.data.LoginResult
+import com.project.standard_login.domain.model.LoginResult
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

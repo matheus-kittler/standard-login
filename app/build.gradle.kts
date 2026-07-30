@@ -2,10 +2,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("com.android.library") // Transformado em Biblioteca/SDK
+    id("com.android.library")
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("maven-publish") // Necessário para o JitPack
+    id("maven-publish")
 }
 
 android {
@@ -13,10 +13,8 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        // ApplicationId removido: Bibliotecas não podem ter ID de aplicativo
         minSdk = 24
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        
         consumerProguardFiles("proguard-rules.pro")
     }
 
@@ -26,7 +24,7 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
-    
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -36,7 +34,6 @@ android {
         compose = true
     }
 
-    // Configura o componente de publicação para gerar o AAR
     publishing {
         singleVariant("release") {
             withSourcesJar()
@@ -44,25 +41,25 @@ android {
     }
 }
 
-// Configuração do JitPack / Maven Publish
 afterEvaluate {
     publishing {
         publications {
             register<MavenPublication>("release") {
                 from(components["release"])
-                
-                // Estes dados são usados pelo JitPack para criar o caminho da dependência
-                groupId = "com.github.kittler_ms"
-                artifactId = "standard-login-sdk"
-                version = "1.0.0"
+
+                groupId = "com.github.matheus-kittler"
+                artifactId = "standard-login"
+                version = "1.0.1"
             }
         }
     }
 }
 
+// Bloco unificado com as duas configurações necessárias para o compilador
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_11)
+        freeCompilerArgs.add("-Xskip-metadata-version-check")
     }
 }
 
@@ -77,7 +74,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
-    
+
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
     implementation(libs.kotlinx.coroutines.android)
@@ -95,5 +92,3 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
-
-apply(plugin = "com.google.gms.google-services")

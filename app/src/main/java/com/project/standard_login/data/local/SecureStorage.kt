@@ -1,4 +1,4 @@
-package com.project.standard_login.security
+package com.project.standard_login.data.local
 
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
@@ -10,14 +10,10 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-/**
- * Gerencia o armazenamento persistente e seguro de credenciais.
- * Utiliza o Android Keystore nativo para criptografia AES-GCM.
- */
 class SecureStorage(context: Context) {
 
     private val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-
+    
     private val keyStore: KeyStore = KeyStore.getInstance(ANDROID_KEY_STORE).apply {
         load(null)
     }
@@ -66,16 +62,14 @@ class SecureStorage(context: Context) {
         return String(cipher.doFinal(encryptedBytes), Charsets.UTF_8)
     }
 
-    // Métodos de Acesso Público
-
     fun saveEmail(email: String) {
-        val encryptedEmail = encrypt(email)
-        sharedPreferences.edit().putString(KEY_USER_EMAIL, encryptedEmail).apply()
+        val encrypted = encrypt(email)
+        sharedPreferences.edit().putString(KEY_USER_EMAIL, encrypted).apply()
     }
 
     fun getEmail(): String? {
-        val encryptedEmail = sharedPreferences.getString(KEY_USER_EMAIL, null)
-        return encryptedEmail?.let {
+        val encrypted = sharedPreferences.getString(KEY_USER_EMAIL, null)
+        return encrypted?.let {
             try { decrypt(it) } catch (e: Exception) { null }
         }
     }
@@ -85,7 +79,7 @@ class SecureStorage(context: Context) {
     }
 
     companion object {
-        private const val PREFS_NAME = "secure_storage_prefs"
+        private const val PREFS_NAME = "standard_login_secure_storage"
         private const val ANDROID_KEY_STORE = "AndroidKeyStore"
         private const val KEY_ALIAS = "StandardLoginKeyAlias"
         private const val TRANSFORMATION = "AES/GCM/NoPadding"
