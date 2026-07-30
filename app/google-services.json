@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "79740117000",
+    "project_id": "standard-login-3dddd",
+    "storage_bucket": "standard-login-3dddd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79740117000:android:0ccdec4d71ba68623471bd",
+        "android_client_info": {
+          "package_name": "com.project.standard_login"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDc-gJuITJiSN-YKq8Tx6pVdns1DD-8kI8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
